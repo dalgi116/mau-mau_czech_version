@@ -7,6 +7,7 @@
 #include <random>
 #include <stdexcept>
 #include <iostream>
+#include <time.h>
 
 class Card
 {
@@ -49,9 +50,8 @@ class DrawPile : public Pile
 public:
     void shuffleCards()
     {
-        std::random_device rd;
-        std::default_random_engine rng(rd());
-        std::shuffle(this->cards.begin(), this->cards.end(), rng);
+        std::srand(static_cast<unsigned int>(time(nullptr)));
+        std::shuffle(this->cards.begin(), this->cards.end(), std::default_random_engine(std::rand()));
     }
     DrawPile(int a, std::vector<Card> b) : Pile(a, b) {};
 };
