@@ -1,15 +1,14 @@
 #include "main.hpp"
 
 
-int whoStarts(const int& roundNum, const bool& startingPlayer)
+bool whoStarts(const int& roundNum, const bool& startingPlayer)
 {
     if (roundNum > 0)
         return !startingPlayer;
     else
     {
         std::srand(static_cast<unsigned int>(time(nullptr)));
-        int num = std::rand() % 2;
-        return num;
+        return std::rand() % 2;
     }
 }
 
@@ -23,15 +22,15 @@ int main()
     };
 
     int usersChoice;
-    int roundNum;
-    int startingPlayer = 0; // 0-user, 1-bot
+    int roundNum = 0;
+    bool startingPlayer; // 0-user, 1-bot
 
     DrawPile drawPile(32, allCards);
     DiscardPile discardPile;
     Hand usersHand, botsHand;
 
 
-    std::cout << "Hello, let's play!\n";
+    std::cout << "Hello, let's play!\n\n";
     
     while (1)
     {
@@ -42,9 +41,9 @@ int main()
         drawPile.moveCards(1, discardPile);
 
         startingPlayer = whoStarts(roundNum, startingPlayer);
-        std::cout << "starting: " << startingPlayer << "\n";
+        std::cout << "Starting player: " << ((startingPlayer) ? "Bot" : "User") << "\n";
 
-        // decides if the user wants to play another game
+        // decides if the user wants to play again
         while (1)
         {
             std::cout << "Do you want to play again?\n";
