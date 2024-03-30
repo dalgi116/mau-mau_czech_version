@@ -59,14 +59,43 @@ public:
 class DiscardPile : public Pile
 {
 public:
-    void printLastCard() {};
+    void printLastCard()
+    {
+        std::cout << this->cards.back().type << " (" << this->cards.back().color << ")";
+    }
 };
 
 class Hand : public Pile
 {
 public:
     void drawCards(int drawCount) {};
-    void printCards() {};
+    void printCards()
+    {
+        for (auto card : this->cards)
+            std::cout << card.type << " (" << card.color << ")\n";
+    }
+};
+
+class Choices
+{
+public:
+    int cardCount;
+    std::string other;
+    std::vector<Card> cards;
+
+    void printChoices()
+    {
+        std::cout << "(1) " << this->other << "\n";
+        if (cardCount > 0)
+        {
+            int i = 1;
+            for (auto card : cards)
+            {
+                i++;
+                std::cout << "(" << i << ") " << card.type << " (" << card.color << ")\n";
+            }
+        }
+    }
 };
 
 #endif /* MAIN_HPP */
