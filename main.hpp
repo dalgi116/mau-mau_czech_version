@@ -132,6 +132,7 @@ public:
 
         if (statementType == "Ace")
         {
+            this->other = "Skip";
             bool hasAce = 0;
             for (auto card : object.cards)
             {
@@ -139,13 +140,11 @@ public:
                     hasAce = 1;
             }
             if (hasAce == 0)
-            {
-                this->other = "Skip";
                 return;
-            }
         }
         else if (statementType == "VII")
         {
+            this->other = "Draw 2 cards";
             bool hasVII = 0;
             for (auto card : object.cards)
             {
@@ -153,13 +152,11 @@ public:
                     hasVII = 1;
             }
             if (hasVII == 0)
-            {
-                this->other = "Draw 2 cards";
                 return;
-            }
         }
 
-        this->other = "Draw a card";
+        if (statementType != "Ace" && statementType != "VII")
+            this->other = "Draw a card";
         
         for (auto card : object.cards)
         {
