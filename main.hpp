@@ -53,6 +53,18 @@ public:
         std::srand(static_cast<unsigned int>(time(nullptr)));
         std::shuffle(this->cards.begin(), this->cards.end(), std::default_random_engine(std::rand()));
     }
+    void drawCards(int moveCount, Pile& moveTo, Pile& moveFromToShuffle)
+    {
+        if (this->count < moveCount)
+        {
+            Card topCard = moveFromToShuffle.cards.back();
+            moveFromToShuffle.cards.pop_back();
+            moveFromToShuffle.moveCards(moveFromToShuffle.count, *this);
+            moveFromToShuffle.cards.push_back(topCard);
+            moveFromToShuffle.count++;
+        }
+        moveCards(moveCount, moveTo);
+    }
     DrawPile(int a, std::vector<Card> b) : Pile(a, b) {};
 };
 
@@ -73,6 +85,20 @@ public:
     {
         for (auto card : this->cards)
             std::cout << card.type << " (" << card.color << ")\n";
+    }
+    void playCard(Card& card, Pile& pile)
+    {
+        pile.cards.push_back(card);
+        pile.count++;
+        int i = 0;
+        for (auto a : this->cards)
+        {
+            if (a.color == card.color && a.type == card.type)
+                break;
+            i++;
+        }
+        this->cards.erase(this->cards.begin() + i);
+        this->count--;
     }
 };
 

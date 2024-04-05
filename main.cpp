@@ -26,6 +26,7 @@ int main()
     bool startingPlayer; // 0-user, 1-bot
     bool activePlayer;
     int choiceCount;
+    bool userWins = 0, botWins = 0;
 
     DrawPile drawPile(32, allCards);
     DiscardPile discardPile;
@@ -64,8 +65,96 @@ int main()
                 // prints choices and lets user to decide
                 std::cout << "What will you play?\n";
                 choices.getChoices(discardPile, usersHand);
+                while (1)
+                {
                 choices.printChoices();
                 std::cout << ">> ";
+                    
+                    std::cin >> usersChoice;
+
+                    if (std::cin.fail())
+                    {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    }
+                    else if (usersChoice > 0 && usersChoice <= choices.cardCount + 1)
+                        break;
+
+                    std::cout << "Invalid input. Try it again.\n\n";
+                }
+                
+                // evaluates the users choice
+                if (usersChoice == 1)
+                {
+                    if (choices.other != "Skip")
+                    {
+                        // user draws cards
+                        int drawCardsCount;
+                        if (choices.other == "Draw a card")
+                            drawCardsCount = 1;
+                        else
+                            drawCardsCount = std::stoi(choices.other.substr(5, 1));
+                        drawPile.drawCards(drawCardsCount, usersHand, discardPile);
+                    }
+                }
+                else
+                {
+                    // user plays a card
+                    Card playedCard = usersHand.cards[usersChoice-1];
+                    usersHand.playCard(playedCard, discardPile);
+                    
+                    // checks a victory
+                    if (usersHand.count == 0)
+                    {
+                        userWins = true;
+                        break;
+                    }
+
+                    if (playedCard.type == "Ober")
+                    {
+                        // asks a player to select a color
+                        while (1)
+                        {
+                            std::cout << "Which color do you change to?\n";
+                            std::cout << "(1) Hearts\n";
+                            std::cout << "(2) Bells\n";
+                            std::cout << "(3) Acorns\n";
+                            std::cout << "(4) Leaves\n";
+                            std::cout << ">> ";
+                            
+                            std::cin >> usersChoice;
+
+                            if (std::cin.fail())
+                            {
+                                std::cin.clear();
+                                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                            }
+                            else if (usersChoice > 0 && usersChoice < 5)
+                                break;
+
+                            std::cout << "Invalid input. Try it again.\n\n";
+                        }
+
+                        char color;
+                        switch (usersChoice)
+                        {
+                        case 1:
+                            color = 'H';
+                            break;
+                        case 2:
+                            color = 'B';
+                            break;
+                        case 3:
+                            color = 'A';
+                            break;
+                        case 4:
+                            color = 'L';
+                            break;
+                        }
+                        discardPile.cards.back().color = color;
+                    }
+                }
+                break;
             }
             else
             {
@@ -100,6 +189,11 @@ int main()
             break;
 
         roundNum++;
+
+        // deletes old game
+        usersHand.moveCards(usersHand.count, drawPile);
+        botsHand.moveCards(botsHand.count, drawPile);
+        discardPile.moveCards(discardPile.count, drawPile);
     }
 
     std::cout << "\nGoodbye...\n";
