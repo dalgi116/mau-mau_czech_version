@@ -12,55 +12,6 @@ bool whoStarts(const int& roundNum, const bool& startingPlayer)
     }
 }
 
-void getChoices(const Pile& statement, const Pile& object, Choices& choices)
-{
-    std::string statementType = statement.cards.back().type;
-    char statementColor = statement.cards.back().color;
-    
-    choices.cardCount = 0;
-    choices.cards.clear();
-
-    if (statementType == "Ace")
-    {
-        bool hasAce = 0;
-        for (auto card : object.cards)
-        {
-            if (card.type == "Ace")
-                hasAce = 1;
-        }
-        if (hasAce == 0)
-        {
-            choices.other = "Skip";
-            return;
-        }
-    }
-    else if (statementType == "VII")
-    {
-        bool hasVII = 0;
-        for (auto card : object.cards)
-        {
-            if (card.type == "VII")
-                hasVII = 1;
-        }
-        if (hasVII == 0)
-        {
-            choices.other = "Draw 2 cards";
-            return;
-        }
-    }
-
-    choices.other = "Draw a card";
-    
-    for (auto card : object.cards)
-    {
-        if (card.type == "Ober" || card.type == statementType || card.color == statementColor)
-        {
-            choices.cardCount++;
-            choices.cards.push_back(card);
-        }
-    }
-}
-
 int main()
 {
     std::vector<Card> allCards = {
@@ -112,7 +63,7 @@ int main()
 
                 // prints choices and lets user to decide
                 std::cout << "What will you play?\n";
-                getChoices(discardPile, usersHand, choices);
+                choices.getChoices(discardPile, usersHand);
                 choices.printChoices();
                 std::cout << ">> ";
             }

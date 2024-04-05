@@ -96,6 +96,54 @@ public:
             }
         }
     }
+    void getChoices(const Pile& statement, const Pile& object)
+    {
+        std::string statementType = statement.cards.back().type;
+        char statementColor = statement.cards.back().color;
+        
+        this->cardCount = 0;
+        this->cards.clear();
+
+        if (statementType == "Ace")
+        {
+            bool hasAce = 0;
+            for (auto card : object.cards)
+            {
+                if (card.type == "Ace")
+                    hasAce = 1;
+            }
+            if (hasAce == 0)
+            {
+                this->other = "Skip";
+                return;
+            }
+        }
+        else if (statementType == "VII")
+        {
+            bool hasVII = 0;
+            for (auto card : object.cards)
+            {
+                if (card.type == "VII")
+                    hasVII = 1;
+            }
+            if (hasVII == 0)
+            {
+                this->other = "Draw 2 cards";
+                return;
+            }
+        }
+
+        this->other = "Draw a card";
+        
+        for (auto card : object.cards)
+        {
+            if (card.type == "Ober" || card.type == statementType || card.color == statementColor)
+            {
+                this->cardCount++;
+                this->cards.push_back(card);
+            }
+        }
+    }
 };
 
 #endif /* MAIN_HPP */
