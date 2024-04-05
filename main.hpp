@@ -122,7 +122,7 @@ public:
             }
         }
     }
-    void getChoices(const Pile& statement, const Pile& object)
+    void getChoices(const Pile& statement, const Pile& object, const int& VIIStack)
     {
         std::string statementType = statement.cards.back().type;
         char statementColor = statement.cards.back().color;
@@ -144,7 +144,7 @@ public:
         }
         else if (statementType == "VII")
         {
-            this->other = "Draw 2 cards";
+            this->other = "Draw " + std::to_string(VIIStack * 2) + " cards";
             bool hasVII = 0;
             for (auto card : object.cards)
             {
@@ -160,10 +160,21 @@ public:
         
         for (auto card : object.cards)
         {
-            if (card.type == "Ober" || card.type == statementType || card.color == statementColor)
+            if (statementType == "Ace" || statementType == "VII")
             {
-                this->cardCount++;
-                this->cards.push_back(card);
+                if (card.type == statementType)
+                {
+                    this->cardCount++;
+                    this->cards.push_back(card);
+                }
+            }
+            else
+            {
+                if (card.type == "Ober" || card.type == statementType || card.color == statementColor)
+                {
+                    this->cardCount++;
+                    this->cards.push_back(card);
+                }
             }
         }
     }

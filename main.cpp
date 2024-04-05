@@ -27,6 +27,7 @@ int main()
     bool activePlayer;
     int choiceCount;
     bool userWins = 0, botWins = 0;
+    int VIIStack = 0;
 
     DrawPile drawPile(32, allCards);
     DiscardPile discardPile;
@@ -43,6 +44,10 @@ int main()
         drawPile.moveCards(4, usersHand);
         drawPile.moveCards(4, botsHand);
         drawPile.moveCards(1, discardPile);
+        if (discardPile.cards.back().type == "VII")
+            VIIStack++;
+        else
+            VIIStack = 0;
 
         startingPlayer = whoStarts(roundNum, startingPlayer);
         activePlayer = startingPlayer;
@@ -64,7 +69,7 @@ int main()
 
                 // prints choices and lets user to decide
                 std::cout << "What will you play?\n";
-                choices.getChoices(discardPile, usersHand);
+                choices.getChoices(discardPile, usersHand, VIIStack);
                 while (1)
                 {
                 choices.printChoices();
@@ -102,6 +107,10 @@ int main()
                     // user plays a card
                     Card playedCard = usersHand.cards[usersChoice-1];
                     usersHand.playCard(playedCard, discardPile);
+                    if (playedCard.type == "VII")
+                        VIIStack++;
+                    else
+                        VIIStack = 0;
                     
                     // checks a victory
                     if (usersHand.count == 0)
