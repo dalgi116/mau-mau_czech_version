@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include <map>
 
 
 bool whoStarts(const int& roundNum, const bool& startingPlayer)
@@ -26,8 +27,9 @@ int main()
     bool startingPlayer; // 0-user, 1-bot
     bool activePlayer;
     int choiceCount;
-    bool userWins = 0, botWins = 0;
+    bool userWins = false, botWins = false;
     int VIIStack = 0;
+    bool VIIUsed, aceUsed;
 
     DrawPile drawPile(32, allCards);
     DiscardPile discardPile;
@@ -44,10 +46,13 @@ int main()
         drawPile.moveCards(4, usersHand);
         drawPile.moveCards(4, botsHand);
         drawPile.moveCards(1, discardPile);
+        if (discardPile.cards.back().type == "Ace")
+            aceUsed = false;
         if (discardPile.cards.back().type == "VII")
+        {
             VIIStack++;
-        else
-            VIIStack = 0;
+            VIIUsed = false;
+        }
 
         startingPlayer = whoStarts(roundNum, startingPlayer);
         activePlayer = startingPlayer;
@@ -69,11 +74,12 @@ int main()
 
                 // prints choices and lets user to decide
                 std::cout << "What will you play?\n";
-                choices.getChoices(discardPile, usersHand, VIIStack);
+                choices.getChoices(discardPile, usersHand, VIIStack, VIIUsed, aceUsed);
+
                 while (1)
                 {
-                choices.printChoices();
-                std::cout << ">> ";
+                    choices.printChoices();
+                    std::cout << ">> ";
                     
                     std::cin >> usersChoice;
 
@@ -91,26 +97,28 @@ int main()
                 // evaluates the users choice
                 if (usersChoice == 1)
                 {
-                    if (choices.other != "Skip")
+                    if (choices.other == "Skip")
+                        aceUsed = true;
+                    else
                     {
                         // user draws cards
                         int drawCardsCount;
                         if (choices.other == "Draw a card")
                             drawCardsCount = 1;
                         else
+                        {
                             drawCardsCount = std::stoi(choices.other.substr(5, 1));
+                            VIIUsed = true;
+                            VIIStack = 0;
+                        }
                         drawPile.drawCards(drawCardsCount, usersHand, discardPile);
                     }
                 }
                 else
                 {
                     // user plays a card
-                    Card playedCard = usersHand.cards[usersChoice-1];
-                    usersHand.playCard(playedCard, discardPile);
-                    if (playedCard.type == "VII")
-                        VIIStack++;
-                    else
-                        VIIStack = 0;
+                    Card playedCard = choices.cards.at(usersChoice - 2);
+                    usersHand.playCard(playedCard, discardPile, VIIStack, VIIUsed, aceUsed);
                     
                     // checks a victory
                     if (usersHand.count == 0)
@@ -163,14 +171,93 @@ int main()
                         discardPile.cards.back().color = color;
                     }
                 }
-                break;
             }
             else
             {
                 // BOTS TURN
 
+                choices.getChoices(discardPile, botsHand, VIIStack, VIIUsed, aceUsed);
+                if (choices.cardCount > 0)
+                {
+                    // bot plays a card
+                    Card playedCard = choices.cards.at(0);
+                    botsHand.playCard(playedCard, discardPile, VIIStack, VIIUsed, aceUsed);
+
+                    // checks a victory
+                    if (botsHand.count == 0)
+                    {
+                        botWins = true;
+                        break;
+                    }
+
+                    if (playedCard.type == "Ober")
+                    {
+                        // gets the most represented color in the hand
+                        std::map<char, int> colors;
+                        colors['H'] = 0, colors['B'] = 0, colors['A'] = 0, colors['L'] = 0;
+
+                        for (auto card : botsHand.cards)
+                        {
+                            for (auto& color : colors)
+                            {
+                                if (card.color == color.first)
+                                    color.second++;
+                            }
+                        }
+                        int highestCount = 0;
+                        char mostRepresentedColor;
+                        for (auto color : colors)
+                        {
+                            if (color.second > highestCount)
+                            {
+                                highestCount = color.second;
+                                mostRepresentedColor = color.first;
+                            }
+                            std::cout << "Color " << color.first << ", " << color.second << "\n";
+                        }
+                        std::cout << "Most represented color: " << mostRepresentedColor << "\n";
+                        discardPile.cards.back().color = mostRepresentedColor;
+                    }
+
+                }
+                else if (choices.other == "Skip")
+                    aceUsed = true;
+                else
+                {
+                    // bot draws cards
+                    int drawCardsCount;
+                    if (choices.other == "Draw a card")
+                        drawCardsCount = 1;
+                    else
+                    {
+                        drawCardsCount = std::stoi(choices.other.substr(5, 1));
+                        VIIUsed = true;
+                        VIIStack = 0;
+                    }
+                    drawPile.drawCards(drawCardsCount, botsHand, discardPile);
+                }
             }
+            std::cout << "\nUsers hand:\n";
+            usersHand.printInfo();
+            std::cout << "\nBots hand:\n";
+            botsHand.printInfo();
+            std::cout << "\nDraw pile:\n";
+            drawPile.printInfo();
+            std::cout << "\nDiscard pile:\n";
+            discardPile.printInfo();
             activePlayer = !activePlayer;
+        }
+
+        // victory announcment
+        if (userWins == true)
+        {
+            std::cout << "\nYou won!\n";
+            std::cout << "Congratulations.\n";
+        }
+        else if (botWins == true)
+        {
+            std::cout << "\nBot wins...\n";
+            std::cout << "Maybe next time.\n";
         }
 
 
@@ -203,6 +290,9 @@ int main()
         usersHand.moveCards(usersHand.count, drawPile);
         botsHand.moveCards(botsHand.count, drawPile);
         discardPile.moveCards(discardPile.count, drawPile);
+        VIIStack = 0;
+        VIIUsed = false;
+        aceUsed = false;
     }
 
     std::cout << "\nGoodbye...\n";

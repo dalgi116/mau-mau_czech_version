@@ -86,8 +86,16 @@ public:
         for (auto card : this->cards)
             std::cout << card.type << " (" << card.color << ")\n";
     }
-    void playCard(Card& card, Pile& pile)
+    void playCard(Card& card, Pile& pile, int& VIIStack, bool& VIIUsed, bool& aceUsed)
     {
+        if (card.type == "VII")
+        {
+            VIIStack++;
+            VIIUsed = false;
+        }
+        if (card.type == "Ace")
+            aceUsed = false;
+
         pile.cards.push_back(card);
         pile.count++;
         int i = 0;
@@ -122,7 +130,7 @@ public:
             }
         }
     }
-    void getChoices(const Pile& statement, const Pile& object, const int& VIIStack)
+    void getChoices(const Pile& statement, const Pile& object, const int& VIIStack, const bool& VIIUsed, const bool& aceUsed)
     {
         std::string statementType = statement.cards.back().type;
         char statementColor = statement.cards.back().color;
@@ -130,7 +138,7 @@ public:
         this->cardCount = 0;
         this->cards.clear();
 
-        if (statementType == "Ace")
+        if (statementType == "Ace" && aceUsed == false)
         {
             this->other = "Skip";
             bool hasAce = 0;
@@ -142,7 +150,7 @@ public:
             if (hasAce == 0)
                 return;
         }
-        else if (statementType == "VII")
+        else if (statementType == "VII" && VIIUsed == false)
         {
             this->other = "Draw " + std::to_string(VIIStack * 2) + " cards";
             bool hasVII = 0;
@@ -154,13 +162,12 @@ public:
             if (hasVII == 0)
                 return;
         }
-
-        if (statementType != "Ace" && statementType != "VII")
+        else
             this->other = "Draw a card";
         
         for (auto card : object.cards)
         {
-            if (statementType == "Ace" || statementType == "VII")
+            if ((statementType == "Ace" && aceUsed == false) || (statementType == "VII" && VIIUsed == false))
             {
                 if (card.type == statementType)
                 {
