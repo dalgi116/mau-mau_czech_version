@@ -50,8 +50,11 @@ class DrawPile : public Pile
 public:
     void shuffleCards()
     {
-        std::srand(static_cast<unsigned int>(time(nullptr)));
-        std::shuffle(this->cards.begin(), this->cards.end(), std::default_random_engine(std::rand()));
+        for (int i = 0; i < 50; i++)
+        {
+            std::srand(static_cast<unsigned int>(time(nullptr)) + i*1000);
+            std::shuffle(this->cards.begin(), this->cards.end(), std::default_random_engine(std::rand()));
+        }
     }
     void drawCards(int moveCount, Pile& moveTo, Pile& moveFromToShuffle)
     {

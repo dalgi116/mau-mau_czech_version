@@ -237,14 +237,6 @@ int main()
                     drawPile.drawCards(drawCardsCount, botsHand, discardPile);
                 }
             }
-            std::cout << "\nUsers hand:\n";
-            usersHand.printInfo();
-            std::cout << "\nBots hand:\n";
-            botsHand.printInfo();
-            std::cout << "\nDraw pile:\n";
-            drawPile.printInfo();
-            std::cout << "\nDiscard pile:\n";
-            discardPile.printInfo();
             activePlayer = !activePlayer;
         }
 
@@ -252,12 +244,12 @@ int main()
         if (userWins == true)
         {
             std::cout << "\nYou won!\n";
-            std::cout << "Congratulations.\n";
+            std::cout << "Congratulations.\n\n";
         }
         else if (botWins == true)
         {
             std::cout << "\nBot wins...\n";
-            std::cout << "Maybe next time.\n";
+            std::cout << "Maybe next time.\n\n";
         }
 
 
