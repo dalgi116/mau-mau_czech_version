@@ -213,9 +213,7 @@ int main()
                                 highestCount = color.second;
                                 mostRepresentedColor = color.first;
                             }
-                            std::cout << "Color " << color.first << ", " << color.second << "\n";
                         }
-                        std::cout << "Most represented color: " << mostRepresentedColor << "\n";
                         discardPile.cards.back().color = mostRepresentedColor;
                     }
 
