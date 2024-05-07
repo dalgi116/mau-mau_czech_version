@@ -1,5 +1,5 @@
 # Mau-Mau Czech version
-This is a Czech version of a popular game Mau-Mau.
+This is a Czech version of a popular game Mau-Mau. For information how the code works, look in the img folder at block_diagram.jpg.
 
 ## Rules
 
